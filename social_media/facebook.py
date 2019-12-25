@@ -1,7 +1,7 @@
 import sys
 from functools import partial
 import requests
-from collections import Counter
+from collections import Counter, defaultdict
 from tqdm import tqdm
 import datetime as dt
 
@@ -16,7 +16,7 @@ def fetch_reactions(post_id, token):
 
     params = {
         'access_token': token,
-        'fields': 'type'
+        'fields': ['id', 'type']
     }
 
     response = requests.get('https://graph.facebook.com/{}/{}/reactions'.format(VERSION, post_id), params=params)
@@ -52,15 +52,19 @@ def fetch_posts(group_id, token):
     return response.json()['feed']['data']
 
 
-def get_reactions_counter(posts, token):
-    reactions_counter = Counter()
+def get_users_reactions(posts, token):
+    users_reactions = defaultdict(Counter)
 
     for post in posts:
         reactions = fetch_reactions(post['id'], token)
 
-        reactions_counter.update(reaction['type'] for reaction in reactions)
+        for reaction in reactions:
+            user_id = reaction['id']
+            reaction_type = reaction['type']
 
-    return reactions_counter
+            users_reactions[user_id][reaction_type] += 1
+
+    return users_reactions
 
 
 def is_published_later_than_date(item: dict, date, key: str) -> bool:
@@ -88,7 +92,7 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
 def get_reactions_counter_from_date(posts, start_date, token):
     filtered_posts = filter(partial(is_published_later_than_date, date=start_date, key='updated_time'),
                             posts)
-    return get_reactions_counter(filtered_posts, token)
+    return get_users_reactions(filtered_posts, token)
 
 
 def get_stat(group_id, token, days_count=30) -> dict:
