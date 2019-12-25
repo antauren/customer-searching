@@ -42,7 +42,7 @@ if __name__ == '__main__':
     elif args.social_media == 'facebook':
         days_count = args.days or 30
 
-        res = get_stat_fb(group_id=dotenv_dict['FB_GROUP_ID'],
+        res = get_stat_fb(group_id=dotenv_dict['FB_RESEARCH_GROUP_ID'],
                           token=dotenv_dict['FB_TOKEN'],
                           days_count=days_count)
 
