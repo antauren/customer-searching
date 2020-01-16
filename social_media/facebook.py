@@ -74,18 +74,11 @@ def is_published_later_than_date(published_date: str, date) -> bool:
 
 def get_top_commenters_ids(posts, start_date, token) -> set:
     all_comments = []
-
     for post in posts:
-        all_comments.extend(
-            fetch_comments(post['id'], token)
-        )
+        all_comments.extend(fetch_comments(post['id'], token))
 
-    dates = (comment['created_time'] for comment in all_comments)
-
-    filtered_comments = filter(
-        partial(is_published_later_than_date, date=start_date),
-        dates
-    )
+    filtered_comments = [comment for comment in all_comments
+                         if is_published_later_than_date(comment['created_time'], start_date)]
 
     top_commenters_ids = {comment['from']['id'] for comment in filtered_comments}
 
@@ -93,12 +86,9 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
 
 
 def get_reactions_counter_from_date(posts, start_date, token):
-    dates = (post['updated_time'] for post in posts)
+    filtered_posts = [post for post in posts
+                      if is_published_later_than_date(post['updated_time'], start_date)]
 
-    filtered_posts = filter(
-        partial(is_published_later_than_date, date=start_date),
-        dates
-    )
     return get_users_reactions(filtered_posts, token)
 
 
