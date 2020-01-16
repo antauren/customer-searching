@@ -74,9 +74,11 @@ def is_published_later_than_date(published_date: str, date) -> bool:
 
 def get_top_commenters_ids(posts, start_date, token) -> set:
     all_comments = []
+
     for post in posts:
-        for comment in fetch_comments(post['id'], token):
-            all_comments.append(comment)
+        all_comments.extend(
+            fetch_comments(post['id'], token)
+        )
 
     dates = (comment['created_time'] for comment in all_comments)
 
