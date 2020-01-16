@@ -35,15 +35,8 @@ def get_stat(research_username, username, password, days_count=90):
 
 
 def filter_comments_by_date(comments, date):
-    filtered_comments = []
-
-    for comment in comments:
-        timestamp = comment['created_at_utc']
-        if dt.datetime.utcfromtimestamp(timestamp) < date:
-            continue
-        filtered_comments.append(comment)
-
-    return filtered_comments
+    return [comment for comment in comments
+            if dt.datetime.utcfromtimestamp(comment['created_at_utc']) >= date]
 
 
 def get_comments_top_users_ids(media_comments: dict) -> Counter:
