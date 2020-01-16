@@ -77,8 +77,8 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
     for post in posts:
         all_comments.extend(fetch_comments(post['id'], token))
 
-    filtered_comments = [comment for comment in all_comments
-                         if is_published_later_than_date(comment['created_time'], start_date)]
+    filtered_comments = (comment for comment in all_comments
+                         if is_published_later_than_date(comment['created_time'], start_date))
 
     top_commenters_ids = {comment['from']['id'] for comment in filtered_comments}
 
@@ -86,8 +86,8 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
 
 
 def get_reactions_counter_from_date(posts, start_date, token):
-    filtered_posts = [post for post in posts
-                      if is_published_later_than_date(post['updated_time'], start_date)]
+    filtered_posts = (post for post in posts
+                      if is_published_later_than_date(post['updated_time'], start_date))
 
     return get_users_reactions(filtered_posts, token)
 
