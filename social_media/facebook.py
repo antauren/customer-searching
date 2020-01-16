@@ -87,7 +87,7 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
         dates
     )
 
-    top_commenters_ids = set(comment['from']['id'] for comment in filtered_comments)
+    top_commenters_ids = {comment['from']['id'] for comment in filtered_comments}
 
     return top_commenters_ids
 

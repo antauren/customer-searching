@@ -59,7 +59,7 @@ def get_posts_top_users_ids(media_comments: dict) -> Counter:
     counter = Counter()
 
     for comments in media_comments.values():
-        unique_user_ids = set(comment['user_id'] for comment in comments)
+        unique_user_ids = {comment['user_id'] for comment in comments}
         counter.update(unique_user_ids)
 
     return counter

@@ -45,7 +45,7 @@ def get_top_ids(access_token, posts, owner_id, days_count=14) -> set:
             partial(is_comment_posted_later_than_date, date=start_date),
             comments
         )
-        commenter_ids = set(comment['from_id'] for comment in comments)
+        commenter_ids = {comment['from_id'] for comment in comments}
 
         top_ids.update(commenter_ids & liker_ids)
 
