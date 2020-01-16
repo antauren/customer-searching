@@ -5,7 +5,6 @@ from collections import Counter, defaultdict
 from tqdm import tqdm
 import datetime as dt
 
-sys.path.append('..')
 from utils.datetime import get_the_beginning
 
 VERSION = 'v5.0'
