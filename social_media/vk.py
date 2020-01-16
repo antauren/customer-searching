@@ -35,19 +35,18 @@ def get_top_ids(access_token, posts, owner_id, days_count=14) -> set:
         likers = fetch_all_items(
             func=partial(get_likers, access_token=access_token, owner_id=post['owner_id'], item_id=post['id'])
         )
-        liker_ids = set(likers)
 
         comments = fetch_all_items(
             func=partial(get_wall_comments, access_token, post['id'], owner_id)
         )
         comments = filter(is_not_deleted, comments)
-        comments = filter(
-            partial(is_comment_posted_later_than_date, date=start_date),
-            comments
-        )
+
+        comments = (comment for comment in comments
+                    if dt.datetime.utcfromtimestamp(comment['date']) >= start_date)
+
         commenter_ids = {comment['from_id'] for comment in comments}
 
-        top_ids.update(commenter_ids & liker_ids)
+        top_ids.update(commenter_ids & set(likers))
 
     return top_ids
 
@@ -129,11 +128,6 @@ def get_wall_comments(access_token, post_id, owner_id, count=100, offset=0):
 
 def is_not_deleted(comment):
     return 'deleted' not in comment
-
-
-def is_comment_posted_later_than_date(comment, date):
-    timestamp = comment['date']
-    return dt.datetime.utcfromtimestamp(timestamp) >= date
 
 
 def get_stat(access_token, domain, days_count):
