@@ -66,10 +66,8 @@ def get_users_reactions(posts, token):
     return users_reactions
 
 
-def is_published_later_than_date(item: dict, date, key: str) -> bool:
-    date_str = item[key]
-
-    date_dt = dt.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S%z')
+def is_published_later_than_date(published_date: str, date) -> bool:
+    date_dt = dt.datetime.strptime(published_date, '%Y-%m-%dT%H:%M:%S%z')
 
     return dt.datetime.timestamp(date_dt) >= dt.datetime.timestamp(date)
 
@@ -80,8 +78,12 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
         for comment in fetch_comments(post['id'], token):
             all_comments.append(comment)
 
-    filtered_comments = filter(partial(is_published_later_than_date, date=start_date, key='created_time'),
-                               all_comments)
+    dates = (comment['created_time'] for comment in all_comments)
+
+    filtered_comments = filter(
+        partial(is_published_later_than_date, date=start_date),
+        dates
+    )
 
     top_commenters_ids = set(comment['from']['id'] for comment in filtered_comments)
 
@@ -89,8 +91,12 @@ def get_top_commenters_ids(posts, start_date, token) -> set:
 
 
 def get_reactions_counter_from_date(posts, start_date, token):
-    filtered_posts = filter(partial(is_published_later_than_date, date=start_date, key='updated_time'),
-                            posts)
+    dates = (post['updated_time'] for post in posts)
+
+    filtered_posts = filter(
+        partial(is_published_later_than_date, date=start_date),
+        dates
+    )
     return get_users_reactions(filtered_posts, token)
 
 
